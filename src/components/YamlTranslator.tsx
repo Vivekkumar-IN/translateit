@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Globe, Download, Send, ChevronLeft, ChevronRight, Search, RotateCcw } from 'lucide-react';
+import { Globe, Download, Send, Search, RotateCcw, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import LanguageInput from './LanguageInput';
 import TranslationCard from './TranslationCard';
@@ -36,7 +35,28 @@ const YamlTranslator = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showOnlyUntranslated, setShowOnlyUntranslated] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [existingTranslations, setExistingTranslations] = useState<YamlData>({});
   const { toast } = useToast();
+
+  // Detect theme on mount
+  useEffect(() => {
+    const detectTheme = () => {
+      const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(darkMode);
+      if (darkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    detectTheme();
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    mediaQuery.addEventListener('change', detectTheme);
+
+    return () => mediaQuery.removeEventListener('change', detectTheme);
+  }, []);
 
   const filteredKeys = allKeys.filter(key => {
     const matchesSearch = key.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,10 +94,24 @@ const YamlTranslator = () => {
         }
       }
 
-      // Load YAML data
+      // Load default English YAML data
       const data = await yamlService.loadYamlFromGitHub();
       setYamlData(data);
       setAllKeys(Object.keys(data));
+
+      // Try to load existing translations for the target language
+      try {
+        const existingData = await yamlService.loadYamlFromGitHub(languageCode);
+        setExistingTranslations(existingData);
+        toast({
+          title: "Existing translations found!",
+          description: `Found existing ${languageCode}.yml with translations to help you`,
+        });
+      } catch (error) {
+        console.log(`No existing ${languageCode}.yml found, starting fresh`);
+        setExistingTranslations({});
+      }
+
       setStep('translating');
 
       toast({
@@ -106,6 +140,13 @@ const YamlTranslator = () => {
   };
 
   const handleSkip = () => {
+    // Use default YAML content when skipping
+    if (currentKey && yamlData[currentKey]) {
+      setTranslations(prev => ({
+        ...prev,
+        [currentKey]: yamlData[currentKey]
+      }));
+    }
     handleNext();
   };
 
@@ -120,13 +161,6 @@ const YamlTranslator = () => {
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
-    }
-  };
-
-  const handleGoToKey = (keyIndex: number) => {
-    const actualIndex = allKeys.indexOf(filteredKeys[keyIndex]);
-    if (actualIndex !== -1) {
-      setCurrentIndex(keyIndex);
     }
   };
 
@@ -176,6 +210,7 @@ const YamlTranslator = () => {
       setUserLang('');
       setSearchTerm('');
       setShowOnlyUntranslated(false);
+      setExistingTranslations({});
     }
   };
 
@@ -238,6 +273,15 @@ const YamlTranslator = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Translation Tips */}
+      <Alert>
+        <Info className="w-4 h-4" />
+        <AlertDescription>
+          <strong>Translation Tips:</strong> Don't edit content inside curly braces {...} - keep them as is. 
+          You can use Telegram-supported HTML formatting like &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;code&gt;code&lt;/code&gt;.
+        </AlertDescription>
+      </Alert>
+
       {/* Header */}
       <Card>
         <CardHeader>
@@ -297,6 +341,8 @@ const YamlTranslator = () => {
           keyName={currentKey}
           originalText={yamlData[currentKey]}
           currentTranslation={translations[currentKey] || ''}
+          existingTranslation={existingTranslations[currentKey] || ''}
+          targetLanguage={userLang}
           onSave={handleSaveTranslation}
           onSkip={handleSkip}
           onPrevious={handlePrevious}

@@ -4,11 +4,13 @@ interface YamlData {
 }
 
 class YamlService {
-  private readonly YAML_URL = "https://raw.githubusercontent.com/TheTeamVivek/YukkiMusic/master/strings/langs/en.yml";
+  private readonly BASE_URL = "https://raw.githubusercontent.com/TheTeamVivek/YukkiMusic/master/strings/langs";
 
-  async loadYamlFromGitHub(): Promise<YamlData> {
+  async loadYamlFromGitHub(languageCode: string = 'en'): Promise<YamlData> {
+    const yamlUrl = `${this.BASE_URL}/${languageCode}.yml`;
+    
     try {
-      const response = await fetch(this.YAML_URL);
+      const response = await fetch(yamlUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -44,7 +46,10 @@ class YamlService {
       
       return yamlData;
     } catch (error) {
-      console.error('Error loading YAML:', error);
+      console.error(`Error loading YAML for ${languageCode}:`, error);
+      if (languageCode !== 'en') {
+        throw new Error(`${languageCode}.yml not found`);
+      }
       throw new Error(`Failed to load YAML: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
