@@ -277,7 +277,7 @@ const YamlTranslator = () => {
       <Alert>
         <Info className="w-4 h-4" />
         <AlertDescription>
-          <strong>Translation Tips:</strong> Do not edit content inside curly braces {...} - keep them as is. 
+          <strong>Translation Tips:</strong> Do not edit content inside curly braces {'{...}'} - keep them as is. 
           You can use Telegram-supported HTML formatting like &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;code&gt;code&lt;/code&gt;.
         </AlertDescription>
       </Alert>
