@@ -37,6 +37,7 @@ const YamlTranslator = () => {
   const [showOnlyUntranslated, setShowOnlyUntranslated] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [existingTranslations, setExistingTranslations] = useState<YamlData>({});
+  const [existingTranslationPercentage, setExistingTranslationPercentage] = useState(0);
   const { toast } = useToast();
 
   // Detect theme on mount
@@ -69,6 +70,16 @@ const YamlTranslator = () => {
   const progress = (Object.keys(translations).length / allKeys.length) * 100;
   const translatedCount = Object.keys(translations).length;
   const totalCount = allKeys.length;
+
+  // Calculate existing translation percentage
+  useEffect(() => {
+    if (Object.keys(existingTranslations).length > 0 && Object.keys(yamlData).length > 0) {
+      const existingCount = Object.keys(existingTranslations).length;
+      const totalKeys = Object.keys(yamlData).length;
+      const percentage = Math.round((existingCount / totalKeys) * 100);
+      setExistingTranslationPercentage(percentage);
+    }
+  }, [existingTranslations, yamlData]);
 
   useEffect(() => {
     // Auto-save translations
@@ -139,18 +150,16 @@ const YamlTranslator = () => {
     handleNext();
   };
 
-  const handleSkip = () => {
-    // Use default YAML content when skipping
-    if (currentKey && yamlData[currentKey]) {
+  const handleNext = () => {
+    // If no custom translation provided, use existing translation or default
+    if (currentKey && !translations[currentKey]) {
+      const defaultValue = existingTranslations[currentKey] || yamlData[currentKey];
       setTranslations(prev => ({
         ...prev,
-        [currentKey]: yamlData[currentKey]
+        [currentKey]: defaultValue
       }));
     }
-    handleNext();
-  };
 
-  const handleNext = () => {
     if (currentIndex < filteredKeys.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else if (filteredKeys.length === allKeys.length) {
@@ -216,14 +225,14 @@ const YamlTranslator = () => {
 
   if (step === 'language') {
     return (
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto px-4">
         <Card>
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
               <Globe className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-2xl">🌍 YAML Translator</CardTitle>
-            <p className="text-muted-foreground">
+            <CardTitle className="text-xl sm:text-2xl">🌍 YAML Translator</CardTitle>
+            <p className="text-muted-foreground text-sm">
               Translate YAML files from GitHub repositories with ease
             </p>
           </CardHeader>
@@ -237,11 +246,11 @@ const YamlTranslator = () => {
 
   if (step === 'complete') {
     return (
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto px-4">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-green-600">✅ Translation Complete!</CardTitle>
-            <p className="text-muted-foreground">
+            <CardTitle className="text-xl sm:text-2xl text-green-600">✅ Translation Complete!</CardTitle>
+            <p className="text-muted-foreground text-sm">
               You have successfully translated {translatedCount} out of {totalCount} keys
             </p>
           </CardHeader>
@@ -251,12 +260,12 @@ const YamlTranslator = () => {
               total={totalCount}
               language={userLang}
             />
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button onClick={handleDownloadYaml} className="flex-1">
+            <div className="flex flex-col gap-3">
+              <Button onClick={handleDownloadYaml} className="w-full">
                 <Download className="w-4 h-4 mr-2" />
                 Download YAML
               </Button>
-              <Button onClick={handleSendToTelegram} disabled={loading} className="flex-1">
+              <Button onClick={handleSendToTelegram} disabled={loading} className="w-full">
                 <Send className="w-4 h-4 mr-2" />
                 {loading ? 'Sending...' : 'Send to Telegram'}
               </Button>
@@ -272,11 +281,11 @@ const YamlTranslator = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4 px-4">
       {/* Translation Tips */}
       <Alert>
         <Info className="w-4 h-4" />
-        <AlertDescription>
+        <AlertDescription className="text-sm">
           <strong>Translation Tips:</strong> Do not edit content inside curly braces {'{...}'} - keep them as is. 
           You can use Telegram-supported HTML formatting like &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;code&gt;code&lt;/code&gt;.
         </AlertDescription>
@@ -284,25 +293,32 @@ const YamlTranslator = () => {
 
       {/* Header */}
       <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="w-5 h-5" />
-                Translating to: <Badge variant="secondary">{userLang.toUpperCase()}</Badge>
-              </CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                Key {currentIndex + 1} of {filteredKeys.length} 
-                {filteredKeys.length !== allKeys.length && ` (filtered from ${allKeys.length})`}
-              </p>
+        <CardHeader className="pb-4">
+          <div className="flex flex-col space-y-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Globe className="w-5 h-5 flex-shrink-0" />
+                  <span className="truncate">Translating to: <Badge variant="secondary">{userLang.toUpperCase()}</Badge></span>
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Key {currentIndex + 1} of {filteredKeys.length} 
+                  {filteredKeys.length !== allKeys.length && ` (filtered from ${allKeys.length})`}
+                </p>
+                {existingTranslationPercentage > 0 && (
+                  <p className="text-xs text-green-600 mt-1">
+                    {existingTranslationPercentage}% pre-translated
+                  </p>
+                )}
+              </div>
+              <Button variant="outline" onClick={handleReset} size="sm" className="flex-shrink-0">
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
             </div>
-            <Button variant="outline" onClick={handleReset} size="sm">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Reset
-            </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0">
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm text-muted-foreground mb-2">
@@ -313,8 +329,8 @@ const YamlTranslator = () => {
             </div>
             
             {/* Search and filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
+            <div className="flex flex-col gap-3">
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search keys or values..."
@@ -327,6 +343,7 @@ const YamlTranslator = () => {
                 variant={showOnlyUntranslated ? "default" : "outline"}
                 onClick={() => setShowOnlyUntranslated(!showOnlyUntranslated)}
                 size="sm"
+                className="w-full sm:w-auto"
               >
                 Untranslated only
               </Button>
@@ -344,7 +361,6 @@ const YamlTranslator = () => {
           existingTranslation={existingTranslations[currentKey] || ''}
           targetLanguage={userLang}
           onSave={handleSaveTranslation}
-          onSkip={handleSkip}
           onPrevious={handlePrevious}
           onNext={handleNext}
           canGoPrevious={currentIndex > 0}
@@ -362,15 +378,15 @@ const YamlTranslator = () => {
       {/* Action buttons */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={handleDownloadYaml} variant="outline" className="flex-1">
+          <div className="flex flex-col gap-3">
+            <Button onClick={handleDownloadYaml} variant="outline" className="w-full">
               <Download className="w-4 h-4 mr-2" />
               Download YAML ({translatedCount} keys)
             </Button>
             <Button 
               onClick={handleSendToTelegram} 
               disabled={loading || translatedCount === 0}
-              className="flex-1"
+              className="w-full"
             >
               <Send className="w-4 h-4 mr-2" />
               {loading ? 'Sending...' : `Send to Telegram (${translatedCount} keys)`}
