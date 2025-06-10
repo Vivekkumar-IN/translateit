@@ -242,7 +242,7 @@ const YamlTranslator = () => {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-green-600">✅ Translation Complete!</CardTitle>
             <p className="text-muted-foreground">
-              You've successfully translated {translatedCount} out of {totalCount} keys
+              You have successfully translated {translatedCount} out of {totalCount} keys
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -277,7 +277,7 @@ const YamlTranslator = () => {
       <Alert>
         <Info className="w-4 h-4" />
         <AlertDescription>
-          <strong>Translation Tips:</strong> Don't edit content inside curly braces {...} - keep them as is. 
+          <strong>Translation Tips:</strong> Do not edit content inside curly braces {...} - keep them as is. 
           You can use Telegram-supported HTML formatting like &lt;b&gt;bold&lt;/b&gt;, &lt;i&gt;italic&lt;/i&gt;, &lt;code&gt;code&lt;/code&gt;.
         </AlertDescription>
       </Alert>
