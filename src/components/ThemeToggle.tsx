@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 const ThemeToggle: React.FC = () => {
@@ -23,27 +23,18 @@ const ThemeToggle: React.FC = () => {
     } else if (theme === 'dark') {
       return <Moon className="w-4 h-4" />;
     } else {
-      // System theme - show sun/moon based on actual system preference
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      return systemTheme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />;
+      return <Monitor className="w-4 h-4" />;
     }
-  };
-
-  const getLabel = () => {
-    if (theme === 'light') return 'Light';
-    if (theme === 'dark') return 'Dark';
-    return 'Auto';
   };
 
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="icon"
       onClick={cycleTheme}
-      className="gap-2"
+      className="w-9 h-9 rounded-lg transition-all duration-200 hover:scale-105"
     >
       {getIcon()}
-      <span className="text-xs">{getLabel()}</span>
     </Button>
   );
 };

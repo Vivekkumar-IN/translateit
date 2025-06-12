@@ -1,50 +1,52 @@
 
-import { CONFIG, getBotToken } from "@/config/appConfig";
-import { yamlService } from "./yamlService";
-import { languageDetectionService } from "./languageDetectionService";
+import { CONFIG } from '@/config/appConfig';
+import { yamlService } from '@/services/yamlService';
+import { languageService } from '@/services/languageService';
 
 class TelegramService {
-  private get API_URL(): string {
-    return `https://api.telegram.org/bot${getBotToken()}`;
+  private readonly botToken: string;
+  private readonly chatId: string;
+  private readonly apiBaseUrl: string;
+
+  constructor() {
+    this.botToken = CONFIG.TELEGRAM.BOT_TOKEN;
+    this.chatId = CONFIG.TELEGRAM.CHAT_ID;
+    this.apiBaseUrl = CONFIG.TELEGRAM.API_BASE;
   }
 
-  async sendTranslations(
-    translations: { [key: string]: string }, 
-    languageCode: string, 
-    username?: string
-  ): Promise<void> {
-    try {
-      // Use the yamlService to generate proper YAML with multiline support
-      const yamlContent = yamlService.generateYamlString(translations);
-      
-      const blob = new Blob([yamlContent], { type: 'text/plain' });
-      const formData = new FormData();
-      
-      const languageName = languageDetectionService.getLanguageName(languageCode);
-      
-      let caption = `🌍 Translation file for ${languageName} (${languageCode.toUpperCase()})\n📊 ${Object.keys(translations).length} translations`;
-      
-      if (username) {
-        caption += `\n👤 Translated by: @${username}`;
-      }
-      
-      formData.append('chat_id', CONFIG.TELEGRAM.CHAT_ID);
-      formData.append('document', blob, `${languageCode}.yml`);
-      formData.append('caption', caption);
+  async sendTranslations(translations: { [key: string]: string }, languageCode: string): Promise<void> {
+    if (!this.botToken || !this.chatId) {
+      console.warn('Telegram bot token or chat ID not configured. Skipping send to Telegram.');
+      return;
+    }
 
-      const response = await fetch(`${this.API_URL}/sendDocument`, {
+    const yamlContent = yamlService.generateYamlString(translations);
+
+    const formData = new FormData();
+    formData.append('chat_id', this.chatId);
+    formData.append('document', new Blob([yamlContent], { type: 'text/plain' }), `${languageCode}.yml`);
+    
+    const languageName = languageService.getLanguageName(languageCode);
+    const caption = `YukkiMusic Translation - ${languageName} (${languageCode.toUpperCase()})`;
+    
+    formData.append('caption', caption);
+
+    try {
+      const url = `${this.apiBaseUrl}/bot${this.botToken}/sendDocument`;
+      const response = await fetch(url, {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
-      const result = await response.json();
-      
-      if (!result.ok) {
-        throw new Error(result.description || 'Failed to send to Telegram');
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Failed to send to Telegram: ${response.status} - ${errorBody}`);
       }
+
+      console.log('Translations sent to Telegram successfully!');
     } catch (error) {
-      console.error('Telegram send error:', error);
-      throw new Error(`Failed to send to Telegram: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error sending translations to Telegram:', error);
+      throw error;
     }
   }
 }

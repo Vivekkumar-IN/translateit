@@ -27,12 +27,12 @@ const TranslationComplete: React.FC<TranslationCompleteProps> = ({
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
-        <Card className="border-green-200 bg-green-50 dark:bg-green-950/30">
+        <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-xl sm:text-2xl text-green-600 dark:text-green-400">
+            <CardTitle className="text-xl sm:text-2xl text-green-600">
               🎉 Translation Complete!
             </CardTitle>
-            <p className="text-green-700 dark:text-green-300 text-sm">
+            <p className="text-muted-foreground text-sm">
               Congratulations! You have successfully completed all translations
             </p>
           </CardHeader>
@@ -44,7 +44,7 @@ const TranslationComplete: React.FC<TranslationCompleteProps> = ({
               isComplete={true}
             />
             <div className="flex flex-col gap-3">
-              <Button onClick={onDownloadYaml} className="w-full bg-green-600 hover:bg-green-700">
+              <Button onClick={onDownloadYaml} className="w-full">
                 <Download className="w-4 h-4 mr-2" />
                 Download YAML
               </Button>

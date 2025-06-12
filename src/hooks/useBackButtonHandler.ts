@@ -1,32 +1,42 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'react-router-dom';
 
 export const useBackButtonHandler = () => {
-  const [backButtonCount, setBackButtonCount] = useState(0);
-  const [showExitDialog, setShowExitDialog] = useState(false);
   const { toast } = useToast();
+  const location = useLocation();
+  const lastBackPressRef = useRef<number>(0);
+  const DOUBLE_PRESS_DELAY = 2000; // 2 seconds
 
-  // Handle browser back button with double-tap confirmation
+  // Only handle back button on main page
   useEffect(() => {
+    // Only enable on root path
+    if (location.pathname !== '/') {
+      return;
+    }
+
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
       
-      if (backButtonCount === 0) {
-        setBackButtonCount(1);
-        toast({
-          title: "Press back again to exit",
-          description: "Tap back button once more to close the application",
-        });
-        
-        // Reset count after 2 seconds
-        setTimeout(() => setBackButtonCount(0), 2000);
-        
-        // Push state back to prevent navigation
-        window.history.pushState(null, '', window.location.href);
+      const now = Date.now();
+      const timeSinceLastPress = now - lastBackPressRef.current;
+      
+      if (timeSinceLastPress < DOUBLE_PRESS_DELAY) {
+        // Double tap detected - quit the app
+        window.close();
       } else {
-        setShowExitDialog(true);
+        // First tap - show toast message
+        lastBackPressRef.current = now;
+        toast({
+          title: "Tap again to quit",
+          description: "Press back button again within 2 seconds to exit the application",
+          duration: 2000,
+        });
       }
+      
+      // Push state back to prevent navigation
+      window.history.pushState(null, '', window.location.href);
     };
 
     // Push initial state to prevent immediate back navigation
@@ -36,21 +46,7 @@ export const useBackButtonHandler = () => {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [backButtonCount, toast]);
+  }, [location.pathname, toast]);
 
-  const handleExitConfirm = () => {
-    window.close();
-  };
-
-  const handleExitCancel = () => {
-    setShowExitDialog(false);
-    setBackButtonCount(0);
-  };
-
-  return {
-    showExitDialog,
-    setShowExitDialog,
-    handleExitConfirm,
-    handleExitCancel
-  };
+  return {};
 };

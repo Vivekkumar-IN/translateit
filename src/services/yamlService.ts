@@ -1,4 +1,3 @@
-
 import * as yaml from 'js-yaml';
 import { CONFIG } from '@/config/appConfig';
 
@@ -7,78 +6,58 @@ interface YamlData {
 }
 
 class YamlService {
-  private readonly BASE_URL = "https://raw.githubusercontent.com/TheTeamVivek/YukkiMusic/master/strings/langs";
-  // private readonly BASE_URL = "https://raw.githubusercontent.com/ViYomX/translateit/main/.github";
-
   async loadYamlFromGitHub(languageCode: string = 'en'): Promise<YamlData> {
-    const yamlUrl = `${this.BASE_URL}/${languageCode}.yml`;
-    
     try {
-      const response = await fetch(yamlUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      const jsonModule = await import(`@/data/langs/${languageCode}.json`);
+      const jsonData = jsonModule.default || jsonModule;
+
+      if (!jsonData || Object.keys(jsonData).length === 0) {
+        throw new Error('No valid JSON key-value pairs found');
       }
-      
-      const text = await response.text();
-      
-      // Use js-yaml to parse the YAML content properly
-      const yamlData = yaml.load(text) as YamlData;
-      
-      if (!yamlData || Object.keys(yamlData).length === 0) {
-        throw new Error('No valid YAML key-value pairs found');
-      }
-      
-      // Convert all values to strings and preserve newlines
+
       const processedData: YamlData = {};
-      for (const [key, value] of Object.entries(yamlData)) {
+      for (const [key, value] of Object.entries(jsonData)) {
         processedData[key] = String(value);
       }
-      
+
       return processedData;
     } catch (error) {
-      console.error(`Error loading YAML for ${languageCode}:`, error);
-      if (languageCode !== 'en') {
-        throw new Error(`${languageCode}.yml not found`);
-      }
-      throw new Error(`Failed to load YAML: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(`Failed to load translations for "${languageCode}"`);
     }
   }
 
   private shouldUseLiteralBlock(value: string): boolean {
     const newlineCount = (value.match(/\n/g) || []).length;
-    return newlineCount > CONFIG.YAML_FORMATTING.MAX_NEWLINES_INLINE || 
-           value.length > CONFIG.YAML_FORMATTING.MAX_LENGTH_INLINE;
+    return (
+      newlineCount > CONFIG.YAML_FORMATTING.MAX_NEWLINES_INLINE ||
+      value.length > CONFIG.YAML_FORMATTING.MAX_LENGTH_INLINE
+    );
   }
 
   generateYamlString(translations: { [key: string]: string }): string {
     try {
-      // Custom YAML generation with intelligent formatting
       const yamlLines: string[] = [];
-      
+
       for (const [key, value] of Object.entries(translations)) {
         if (this.shouldUseLiteralBlock(value)) {
-          // Use literal block style for multiline or long strings
           yamlLines.push(`${key}: |`);
           const lines = value.split('\n');
           for (const line of lines) {
             yamlLines.push(`  ${line}`);
           }
         } else {
-          // Use quoted style for simple strings
           const escapedValue = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
           yamlLines.push(`${key}: "${escapedValue}"`);
         }
       }
-      
+
       return yamlLines.join('\n');
-    } catch (error) {
-      console.error('Error generating YAML:', error);
-      // Fallback to js-yaml if custom generation fails
+    } catch {
       return yaml.dump(translations, {
         lineWidth: -1,
         noRefs: true,
         quotingType: '"',
-        forceQuotes: false
+        forceQuotes: false,
       });
     }
   }
@@ -87,7 +66,7 @@ class YamlService {
     const yamlContent = this.generateYamlString(translations);
     const blob = new Blob([yamlContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    
+
     const link = document.createElement('a');
     link.href = url;
     link.download = `${languageCode}.yml`;

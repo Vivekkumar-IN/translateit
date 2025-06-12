@@ -3,24 +3,28 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
-import { CONFIG } from "./src/config/appConfig";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+export default defineConfig(({ mode }) => {
+  // Get base path from environment variable, default to "/" for all environments
+  const basePath = process.env.VITE_BASE_PATH || "/";
+  
+  return {
+    server: {
+      host: "::",
+      port: 8080,
     },
-  },
-  // Use base path from config for GitHub Pages, root for local development
-  base: mode === 'production' ? CONFIG.DEPLOYMENT.BASE_PATH : "/",
-}));
+    plugins: [
+      react(),
+      mode === 'development' &&
+      componentTagger(),
+    ].filter(Boolean),
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
+    // Use base path from environment variable or default to "/"
+    base: basePath,
+  };
+});

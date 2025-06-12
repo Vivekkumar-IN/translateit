@@ -41,25 +41,29 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   const [searchInput, setSearchInput] = useState(filters.searchTerm);
 
   // Calculate the actual filtered count based on current filters
-  const actualFilteredKeys = allKeys.filter(key => {
-    const keyLower = key.toLowerCase();
-    
-    // Search only by key name
-    if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase();
-      if (!keyLower.includes(searchLower)) {
-        return false;
+  const getFilteredKeys = () => {
+    return allKeys.filter(key => {
+      // Search by key name (exact match and partial match)
+      if (filters.searchTerm) {
+        const searchLower = filters.searchTerm.toLowerCase();
+        const keyLower = key.toLowerCase();
+        
+        // Check if the search term matches the key exactly or partially
+        if (!keyLower.includes(searchLower)) {
+          return false;
+        }
       }
-    }
 
-    // Translation status filters
-    const isTranslated = !!translations[key];
-    if (filters.showOnlyUntranslated && isTranslated) return false;
-    if (filters.showOnlyTranslated && !isTranslated) return false;
+      // Translation status filters
+      const isTranslated = !!translations[key];
+      if (filters.showOnlyUntranslated && isTranslated) return false;
+      if (filters.showOnlyTranslated && !isTranslated) return false;
 
-    return true;
-  });
+      return true;
+    });
+  };
 
+  const actualFilteredKeys = getFilteredKeys();
   const actualFilteredCount = actualFilteredKeys.length;
 
   // Auto-search with debounce
@@ -127,7 +131,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search keys..."
+            placeholder="Search keys (e.g., play_4, main_body)..."
             value={searchInput}
             onChange={handleSearchChange}
             className="pl-10 pr-10"

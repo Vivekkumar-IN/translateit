@@ -2,12 +2,10 @@
 import { useToast } from '@/hooks/use-toast';
 import { yamlService } from '@/services/yamlService';
 import { storageService } from '@/services/storageService';
-import { TranslationData } from '@/types';
 
 interface UseTranslationFlowProps {
   setLoading: (loading: boolean) => void;
   setUserLang: (lang: string) => void;
-  setUsername: (username: string | undefined) => void;
   setYamlData: (data: any) => void;
   setAllKeys: (keys: string[]) => void;
   setTranslations: (translations: any) => void;
@@ -19,7 +17,6 @@ interface UseTranslationFlowProps {
 export const useTranslationFlow = ({
   setLoading,
   setUserLang,
-  setUsername,
   setYamlData,
   setAllKeys,
   setTranslations,
@@ -29,39 +26,13 @@ export const useTranslationFlow = ({
 }: UseTranslationFlowProps) => {
   const { toast } = useToast();
 
-  const handleStartTranslation = async (data: { languageCode: string; username?: string }) => {
-    setLoading(true);
-
-    try {
-      // Check for existing translations first - both recent and older saved progress
-      const recentData = storageService.loadRecentTranslations(data.languageCode);
-      const savedData = storageService.loadTranslations(data.languageCode);
-      
-      if (recentData && Object.keys(recentData.translations).length > 0) {
-        // Always show dialog for any existing progress
-        return { showDialog: true, savedData: recentData, languageCode: data.languageCode, username: data.username };
-      } else if (savedData && Object.keys(savedData.translations).length > 0) {
-        // Show dialog for older saved progress
-        return { showDialog: true, savedData, languageCode: data.languageCode, username: data.username };
-      } else {
-        // No existing translations, start fresh
-        await proceedWithTranslation(data.languageCode, undefined, data.username);
-        return { showDialog: false };
-      }
-    } catch (error) {
-      toast({
-        title: "Error loading YAML",
-        description: error instanceof Error ? error.message : "Failed to load translation data",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return { showDialog: false };
-    }
+  const handleStartTranslation = async (data: { languageCode: string }) => {
+    await proceedWithTranslation(data.languageCode);
   };
 
-  const proceedWithTranslation = async (languageCode: string, existingData?: TranslationData, userUsername?: string) => {
+  const proceedWithTranslation = async (languageCode: string, existingData?: any) => {
+    setLoading(true);
     setUserLang(languageCode);
-    setUsername(userUsername);
 
     try {
       // Load default English YAML data
@@ -79,10 +50,6 @@ export const useTranslationFlow = ({
       try {
         const existingData = await yamlService.loadYamlFromGitHub(languageCode);
         setExistingTranslations(existingData);
-        toast({
-          title: "Existing translations found!",
-          description: `Found existing ${languageCode}.yml with translations to help you`,
-        });
       } catch (error) {
         console.log(`No existing ${languageCode}.yml found, starting fresh`);
         setExistingTranslations({});

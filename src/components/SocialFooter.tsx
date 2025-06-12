@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Github, MessageCircle } from 'lucide-react';
-import { CONFIG } from '@/config/appConfig';
+import { AppService } from '@/config/appService';
 
 const SocialFooter: React.FC = () => {
   return (
     <div className="flex justify-center items-center gap-4 py-4 border-t border-border mt-8">
       <a
-        href={CONFIG.SOCIAL_LINKS.TELEGRAM}
+        href={AppService.SOCIAL_LINKS.TELEGRAM}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
@@ -16,7 +16,7 @@ const SocialFooter: React.FC = () => {
         <span className="text-sm">Telegram</span>
       </a>
       <a
-        href={CONFIG.SOCIAL_LINKS.GITHUB}
+        href={AppService.SOCIAL_LINKS.GITHUB}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

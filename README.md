@@ -1,13 +1,27 @@
 
 # YukkiMusic Translation Tool
 
-A web-based translation tool for YukkiMusic language files built with React, TypeScript, and Tailwind CSS.
+A modern, AI-powered web application for translating YukkiMusic language files with an intuitive interface built using React, TypeScript, and Tailwind CSS.
+
+## ✨ Features
+
+- 🌐 **Smart Language Detection**: Automatically detects and loads available translations
+- 🎨 **Modern UI**: Beautiful, responsive interface with dark/light/auto theme support
+- 📝 **Advanced Translation Interface**: Easy-to-use cards with smart formatting
+- 🔍 **Powerful Search & Filter**: Real-time search with translation status filtering
+- 💾 **Auto-save Progress**: Automatic saving with timestamp tracking
+- 🚀 **Smart YAML Export**: Intelligent formatting with block literal style for multiline content
+- 📱 **Mobile-First Design**: Fully responsive across all devices
+- 🎯 **Progress Tracking**: Real-time statistics and completion indicators
+- 🔄 **Session Management**: Smart browser navigation and session restoration
+- 📤 **Multiple Export Options**: Download YAML or send directly to Telegram
+- ⚡ **Performance Optimized**: Fast loading with efficient state management
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18 or later
-- npm or yarn package manager
+- Node.js 18+ 
+- npm, yarn, or pnpm package manager
 
 ### Installation & Development
 
@@ -25,39 +39,34 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) to view the application.
 
-## 🔧 Environment Variables
+## 🔧 Environment Configuration
 
-The application supports the following environment variables for secure configuration:
-
-### Required for Telegram Integration
-- `VITE_TELEGRAM_BOT_BASE` - Base part of your Telegram bot token (e.g., "1234567890")
-- `VITE_TELEGRAM_BOT_TOKEN` - Secret part of your Telegram bot token (after the colon)
-- `VITE_TELEGRAM_CHAT_ID` - Telegram chat ID where translations will be sent
-
-### Setting Environment Variables
-
-#### For Local Development
-Create a `.env.local` file in the project root:
+### Required Variables (for Telegram integration)
 ```env
-VITE_TELEGRAM_BOT_BASE=your_bot_base_token
-VITE_TELEGRAM_BOT_TOKEN=your_bot_secret_token
-VITE_TELEGRAM_CHAT_ID=your_chat_id
+VITE_TELEGRAM_BOT_TOKEN=your_bot_token_here
+VITE_TELEGRAM_CHAT_ID=your_chat_id_here
 ```
 
-#### For GitHub Actions Deployment
-1. Go to your GitHub repository
-2. Navigate to Settings → Secrets and variables → Actions
-3. Add the following repository secrets:
-   - `VITE_TELEGRAM_BOT_BASE`
-   - `VITE_TELEGRAM_BOT_TOKEN`
-   - `VITE_TELEGRAM_CHAT_ID`
+### Optional Variables
+```env
+VITE_BASE_PATH=/                    # Base path for deployment
+VITE_TRANSLATION_ETA_SECONDS=30     # Translation time estimate
+```
 
-#### For Other Hosting Platforms
-- **Vercel**: Add environment variables in the Vercel dashboard
-- **Netlify**: Add environment variables in site settings
-- **Other platforms**: Consult your platform's documentation for environment variable configuration
+### Platform-Specific Setup
 
-## 📁 Project Structure
+#### GitHub Actions
+Add to repository secrets:
+- `VITE_TELEGRAM_BOT_TOKEN`
+- `VITE_TELEGRAM_CHAT_ID`
+- `VITE_BASE_PATH` (set to "/translateit/" for GitHub Pages)
+
+#### Vercel/Netlify
+Add environment variables in dashboard:
+- Set `VITE_BASE_PATH` to "/"
+- Add other required variables
+
+## 📁 Project Architecture
 
 ```
 src/
@@ -65,119 +74,155 @@ src/
 │   ├── ui/             # Reusable UI components (shadcn/ui)
 │   ├── YamlTranslator.tsx   # Main translation interface
 │   ├── TranslationCard.tsx  # Individual translation card
-│   ├── LanguageSelection.tsx # Language picker screen
+│   ├── LanguageSelection.tsx # Language picker
+│   ├── ThemeProvider.tsx    # Theme management
 │   └── ...             # Other components
 ├── hooks/              # Custom React hooks
 │   ├── useTranslationState.ts    # Translation state management
-│   ├── useBackButtonHandler.ts   # Browser back button handling
+│   ├── useAutoLoadTranslations.ts # Auto-loading logic
 │   └── ...             # Other hooks
-├── services/           # API and external service integrations
-│   ├── yamlService.ts  # YAML file loading/processing
-│   ├── telegramService.ts # Telegram bot integration
-│   └── storageService.ts  # Local storage management
-├── config/             # Application configuration
-│   └── appConfig.ts    # Main configuration file
-├── types/              # TypeScript type definitions
+├── services/           # External service integrations
+│   ├── yamlService.ts  # YAML processing
+│   ├── telegramService.ts # Telegram integration
+│   ├── storageService.ts  # Local storage
+│   └── languageService.ts # Language detection
+├── config/             # Configuration management
+│   └── appService.ts   # Centralized app configuration
+├── types/              # TypeScript definitions
+├── data/               # Language data and translations
 └── pages/              # Route components
 ```
 
+## 🎨 Theme System
+
+The application features a sophisticated theme system with three modes:
+
+- **Light Mode**: Clean, bright interface optimized for daylight use
+- **Dark Mode**: Eye-friendly dark interface for low-light environments  
+- **Auto Mode**: Automatically follows system preference with smart detection
+
+Toggle between themes using the enhanced theme button in the header.
+
 ## 🌐 Deployment Options
 
-### Option 1: Lovable Platform (Recommended)
-1. Open your project in [Lovable](https://lovable.dev)
-2. Click "Share" → "Publish"
-3. Your app will be deployed automatically
+### 1. Lovable Platform (Recommended)
+- One-click deployment via Lovable editor
+- Automatic SSL and global CDN
+- Built-in analytics and monitoring
 
-### Option 2: Vercel
-1. Connect your GitHub repository to Vercel
-2. Configure build settings:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-3. Add environment variables in Vercel dashboard
-4. Deploy automatically on every push
+### 2. Vercel
+```bash
+# Connect repository and deploy
+vercel --prod
+```
 
-### Option 3: Netlify
-1. Connect your GitHub repository to Netlify
-2. Build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-3. Add environment variables in site settings
-4. Enable automatic deployments
+### 3. Netlify
+```bash
+# Build and deploy
+npm run build
+netlify deploy --prod --dir=dist
+```
 
-### Option 4: GitHub Pages
-1. Add environment variables as GitHub repository secrets
-2. Build the project using GitHub Actions (automatic with provided workflow)
-3. Pages will be deployed automatically
+### 4. GitHub Pages
+- Automatic deployment via GitHub Actions
+- Custom domain support
+- Free hosting for public repositories
 
-### Option 5: Self-Hosted
-1. Set environment variables in your hosting environment
-2. Build the project: `npm run build`
-3. Upload the `dist/` folder contents to your web server
-4. Configure your web server to serve the `index.html` for all routes
+### 5. Self-Hosted
+```bash
+# Build for production
+npm run build
+
+# Upload dist/ folder to your server
+# Configure web server for SPA routing
+```
 
 ## ⚙️ Configuration
 
-The application can be configured by editing the `src/config/appConfig.ts` file:
+Customize the application by editing `src/config/appService.ts`:
 
 ```typescript
-export const CONFIG = {
+export const AppService = {
   APP_NAME: "YukkiMusic",
   
   DEPLOYMENT: {
-    BASE_PATH: "/translateit/",
+    BASE_PATH: import.meta.env.VITE_BASE_PATH || "/",
   },
   
   TELEGRAM: {
-    BOT_BASE: import.meta.env.VITE_TELEGRAM_BOT_BASE || "fallback_base",
-    BOT_TOKEN: import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "fallback_token",
-    CHAT_ID: import.meta.env.VITE_TELEGRAM_CHAT_ID || "fallback_chat_id",
+    BOT_TOKEN: import.meta.env.VITE_TELEGRAM_BOT_TOKEN,
+    CHAT_ID: import.meta.env.VITE_TELEGRAM_CHAT_ID,
   },
 
   YAML_FORMATTING: {
-    MAX_NEWLINES_INLINE: 1,    # Use block style for strings with >1 newlines
-    MAX_LENGTH_INLINE: 100,    # Use block style for strings >100 characters
+    MAX_NEWLINES_INLINE: 1,    // Use block style for multiline content
+    MAX_LENGTH_INLINE: 100,    // Use block style for long strings
   },
 
-  SOCIAL_LINKS: {
-    TELEGRAM: "https://t.me/YourChannel",
-    GITHUB: "https://github.com/YourUsername/YourRepo"
+  TRANSLATION_WARNING: {
+    enabled: true,             // Show translation guidelines
+    variant: "destructive"     // Warning style
   }
 };
 ```
 
-## 📱 Features
-
-- **Translation Interface**: Easy-to-use translation cards with original text and translation input
-- **Smart YAML Formatting**: Automatically uses block literal style (|) for multiline content and long strings
-- **Search & Filter**: Advanced search with key-based filtering and translation status
-- **Progress Tracking**: Real-time progress indicators and statistics
-- **Auto-save**: Automatic saving of translation progress
-- **Browser Navigation**: Smart back button handling with double-tap exit confirmation
-- **Export Options**: Download YAML files or send to Telegram
-- **Environment Variable Support**: Secure configuration for production deployments
-
 ## 🛠️ Development
 
 ### Available Scripts
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `npm run dev` - Start development server with HMR
+- `npm run build` - Build optimized production bundle
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint for code quality
 
 ### Technology Stack
-- **Frontend**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS, shadcn/ui components
-- **State Management**: React hooks and context
-- **YAML Processing**: js-yaml library with intelligent formatting
-- **Icons**: Lucide React
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite for fast development and building
+- **Styling**: Tailwind CSS with custom design system
+- **UI Components**: shadcn/ui for consistent interface
+- **State Management**: React hooks with context
+- **YAML Processing**: js-yaml with intelligent formatting
+- **Icons**: Lucide React for beautiful, consistent icons
+- **Routing**: React Router for SPA navigation
 
-## 🔒 Security Notes
+## 🔄 Automated Updates
 
-- Never commit actual bot tokens or API keys to the repository
-- Use environment variables for all sensitive configuration
-- The fallback tokens in the config file should be placeholder values only
-- Always use repository secrets for GitHub Actions deployment
+The project includes GitHub Actions for automated maintenance:
+- **Language Data Sync**: Daily updates from YukkiMusic repository
+- **ISO Code Updates**: Automatic language code synchronization
+- **Dependency Updates**: Regular security and feature updates
+
+## 🔒 Security & Privacy
+
+- **No Server Dependencies**: Completely client-side application
+- **Secure Environment Variables**: All sensitive data via environment variables
+- **Local Storage**: Translation progress stored locally for privacy
+- **HTTPS Required**: Secure connections for all external communications
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- [YukkiMusic](https://github.com/TheTeamVivek/YukkiMusic) - The amazing music bot this tool supports
+- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Lucide](https://lucide.dev/) - Beautiful icon library
+
+---
+
+<div align="center">
+  <p>Made with ❤️ for the YukkiMusic community</p>
+  <p>
+    <a href="https://t.me/TheTeamVivek">Telegram</a> •
+    <a href="https://github.com/TheTeamVivek/YukkiMusic">GitHub</a>
+  </p>
+</div>
