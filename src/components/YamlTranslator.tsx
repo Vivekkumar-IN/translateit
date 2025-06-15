@@ -219,25 +219,28 @@ const YamlTranslator = () => {
   const totalCount = allKeys.length;
 
   const handleSaveTranslation = (translation: string) => {
-    if (translation.trim() && currentKey) {
-      setTranslations(prev => ({
-        ...prev,
-        [currentKey]: translation.trim()
-      }));
+    if (currentKey) {
+      // Save the actual translation provided by the user
+      if (translation.trim()) {
+        // User provided a custom translation
+        setTranslations(prev => ({
+          ...prev,
+          [currentKey]: translation.trim()
+        }));
+      } else {
+        // User didn't provide a translation, use existing or original as fallback
+        const fallbackTranslation = existingTranslations[currentKey] || yamlData[currentKey];
+        setTranslations(prev => ({
+          ...prev,
+          [currentKey]: fallbackTranslation
+        }));
+      }
     }
     handleNext();
   };
 
   const handleNext = () => {
-    // If no custom translation provided, use existing translation or default
-    if (currentKey && !translations[currentKey]) {
-      const defaultValue = existingTranslations[currentKey] || yamlData[currentKey];
-      setTranslations(prev => ({
-        ...prev,
-        [currentKey]: defaultValue
-      }));
-    }
-
+    // Move to next translation without overriding what was just saved
     if (currentIndex < filteredKeys.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else if (filteredKeys.length === allKeys.length) {

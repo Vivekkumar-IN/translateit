@@ -47,7 +47,7 @@ const HomePage: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Link to="/translate">
-              <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white shadow-2xl transition-colors duration-300">
+              <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white shadow-2xl">
                 Start Translating
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
@@ -57,53 +57,45 @@ const HomePage: React.FC = () => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-lg">
-            <CardHeader className="text-center pb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <Languages className="w-8 h-8 text-white" />
-              </div>
-              <CardTitle className="text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Multi-Language Support
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground">
-                Translate YukkiMusic into dozens of languages with our comprehensive language database and intelligent translation system.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-lg">
-            <CardHeader className="text-center pb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <CardTitle className="text-xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                Easy to Use
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground">
-                Simple, intuitive interface that makes translation accessible to everyone. No technical knowledge required.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-lg">
-            <CardHeader className="text-center pb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <Globe className="w-8 h-8 text-white" />
-              </div>
-              <CardTitle className="text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Growing Community
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-muted-foreground">
-                Join our growing community making YukkiMusic accessible to music lovers worldwide.
-              </p>
-            </CardContent>
-          </Card>
+          {[
+            {
+              icon: Languages,
+              title: "Multi-Language Support",
+              description: "Translate YukkiMusic into dozens of languages with our comprehensive language database and intelligent translation system.",
+              gradient: "from-blue-500 to-indigo-600",
+              textGradient: "from-blue-600 to-indigo-600"
+            },
+            {
+              icon: Sparkles,
+              title: "Easy to Use", 
+              description: "Simple, intuitive interface that makes translation accessible to everyone. No technical knowledge required.",
+              gradient: "from-green-500 to-emerald-600",
+              textGradient: "from-green-600 to-emerald-600"
+            },
+            {
+              icon: Globe,
+              title: "Growing Community",
+              description: "Join our growing community making YukkiMusic accessible to music lovers worldwide.",
+              gradient: "from-purple-500 to-pink-600",
+              textGradient: "from-purple-600 to-pink-600"
+            }
+          ].map((feature, index) => (
+            <Card key={index} className="border-0 shadow-xl bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-lg">
+              <CardHeader className="text-center pb-4">
+                <div className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                <CardTitle className={`text-xl bg-gradient-to-r ${feature.textGradient} bg-clip-text text-transparent`}>
+                  {feature.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-muted-foreground">
+                  {feature.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* How it Works Section */}
@@ -162,7 +154,7 @@ const HomePage: React.FC = () => {
               <Link to="/translate">
                 <Button 
                   size="lg" 
-                  className="text-base sm:text-lg px-8 sm:px-10 py-4 sm:py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white shadow-2xl transition-colors duration-300 rounded-xl"
+                  className="text-base sm:text-lg px-8 sm:px-10 py-4 sm:py-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white shadow-2xl rounded-xl"
                 >
                   Begin Translation Journey
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 sm:ml-3" />

@@ -42,6 +42,8 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   }, [currentTranslation, existingTranslation, keyName]);
 
   const handleSave = () => {
+    // Always save what's currently in the textarea, even if it's empty
+    // If empty, we'll let the parent component decide what to do
     onSave(translation);
   };
 
@@ -66,6 +68,17 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
       return "Edit the existing translation or keep it as is...";
     }
     return "Enter your translation here...";
+  };
+
+  const getSaveButtonText = () => {
+    if (translation.trim()) {
+      return 'Save & Continue';
+    }
+    // Show what will be used as default when no custom translation is provided
+    if (existingTranslation) {
+      return 'Use Existing & Continue';
+    }
+    return 'Use Original & Continue';
   };
 
   // Format text for display, preserving newlines
@@ -146,7 +159,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
             size="sm"
           >
             <Save className="w-4 h-4 mr-2" />
-            {translation.trim() ? 'Save & Continue' : 'Use Default & Continue'}
+            {getSaveButtonText()}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
