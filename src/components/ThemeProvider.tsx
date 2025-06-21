@@ -18,7 +18,7 @@ type ThemeProviderState = {
 }
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "light",
   setTheme: () => null,
 }
 
@@ -53,6 +53,27 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme)
+  }, [theme, enableSystem])
+
+  // Listen for system theme changes when theme is set to "system"
+  useEffect(() => {
+    if (theme === "system" && enableSystem) {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+      
+      const handleChange = () => {
+        const root = window.document.documentElement
+        root.classList.remove("light", "dark")
+        
+        const systemTheme = mediaQuery.matches ? "dark" : "light"
+        root.classList.add(systemTheme)
+      }
+
+      // Listen for changes
+      mediaQuery.addEventListener("change", handleChange)
+      
+      // Cleanup
+      return () => mediaQuery.removeEventListener("change", handleChange)
+    }
   }, [theme, enableSystem])
 
   const value = {

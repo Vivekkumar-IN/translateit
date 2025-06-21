@@ -15,13 +15,13 @@ export const useTranslationState = () => {
   const [existingTranslationPercentage, setExistingTranslationPercentage] = useState(0);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
-  // Enhanced auto-save with timestamp
+  // Enhanced auto-save with timestamp and key validation
   useEffect(() => {
-    if (userLang && Object.keys(translations).length > 0) {
-      storageService.saveTranslations(userLang, { translations, index: currentIndex, language: userLang });
+    if (userLang && Object.keys(translations).length > 0 && allKeys.length > 0) {
+      storageService.saveTranslations(userLang, { translations, index: currentIndex, language: userLang }, allKeys);
       setLastSaved(new Date());
     }
-  }, [translations, currentIndex, userLang]);
+  }, [translations, currentIndex, userLang, allKeys]);
 
   // Calculate existing translation percentage
   useEffect(() => {

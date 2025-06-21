@@ -68,6 +68,7 @@ const YamlTranslator = () => {
     isInitializing
   } = useAutoLoadTranslations();
 
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchTerm: '',
     showOnlyUntranslated: false,
@@ -254,19 +255,20 @@ const YamlTranslator = () => {
     }
   };
 
-  const handleDownloadYaml = () => {
+  const handleDownloadYaml = async () => {
+    setDownloadLoading(true);
     try {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for UX
       yamlService.downloadTranslations(translations, userLang);
-      toast({
-        title: "Download started!",
-        description: `${userLang}.yml file is being downloaded`,
-      });
+      
     } catch (error) {
       toast({
         title: "Download failed",
         description: "Unable to generate YAML file",
         variant: "destructive",
       });
+    } finally {
+      setDownloadLoading(false);
     }
   };
 
@@ -305,14 +307,24 @@ const YamlTranslator = () => {
     });
     setExistingTranslations({});
     setShowRestartDialog(false);
-    toast({
-      title: "Translation restarted",
-      description: "All translations and cache have been cleared. Starting fresh!",
-    });
   };
 
   const handleReset = () => {
     setShowRestartDialog(true);
+  };
+
+  const handleStartNew = () => {
+    // Clear all state and go directly to language selection
+    setTranslations({});
+    setCurrentIndex(0);
+    setStep('language');
+    setUserLang('');
+    setSearchFilters({
+      searchTerm: '',
+      showOnlyUntranslated: false,
+      showOnlyTranslated: false
+    });
+    setExistingTranslations({});
   };
 
   if (step === 'language') {
@@ -331,9 +343,11 @@ const YamlTranslator = () => {
         totalCount={totalCount}
         userLang={userLang}
         loading={loading}
+        downloadLoading={downloadLoading}
         onDownloadYaml={handleDownloadYaml}
         onSendToTelegram={handleSendToTelegram}
         onReset={handleReset}
+        onStartNew={handleStartNew}
       />
     );
   }
@@ -407,9 +421,23 @@ const YamlTranslator = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-              <Button onClick={handleDownloadYaml} variant="outline" className="w-full">
-                <Download className="w-4 h-4 mr-2" />
-                Download YAML ({translatedCount} keys)
+              <Button 
+                onClick={handleDownloadYaml} 
+                variant="outline" 
+                className="w-full"
+                disabled={downloadLoading}
+              >
+                {downloadLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Downloading...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    Download YAML ({translatedCount} keys)
+                  </>
+                )}
               </Button>
               <Button 
                 onClick={handleSendToTelegram} 

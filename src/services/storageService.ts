@@ -1,9 +1,9 @@
-
 interface StoredTranslationData {
   translations: { [key: string]: string };
   index: number;
   language: string;
   timestamp: number;
+  keysHash?: string; // Add hash to detect key changes
 }
 
 class StorageService {
@@ -15,11 +15,18 @@ class StorageService {
     return 'current_language_key';
   }
 
-  saveTranslations(languageCode: string, data: Omit<StoredTranslationData, 'timestamp'>): void {
+  // Generate a hash that preserves the original order of keys
+  private generateKeysHash(keys: string[]): string {
+    // Don't sort the keys - keep their original order for the hash
+    return keys.join('|');
+  }
+
+  saveTranslations(languageCode: string, data: Omit<StoredTranslationData, 'timestamp' | 'keysHash'>, currentKeys?: string[]): void {
     try {
       const storageData: StoredTranslationData = {
         ...data,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        keysHash: currentKeys ? this.generateKeysHash(currentKeys) : undefined
       };
       localStorage.setItem(this.getStorageKey(languageCode), JSON.stringify(storageData));
       // Also save the current language key
@@ -46,7 +53,7 @@ class StorageService {
     }
   }
 
-  loadTranslations(languageCode: string): StoredTranslationData | null {
+  loadTranslations(languageCode: string, currentKeys?: string[]): StoredTranslationData | null {
     try {
       const stored = localStorage.getItem(this.getStorageKey(languageCode));
       if (!stored) return null;
@@ -56,8 +63,19 @@ class StorageService {
       // Check if data is older than 7 days
       const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
       if (data.timestamp < sevenDaysAgo) {
+        console.log('Cache expired, clearing translations for', languageCode);
         this.clearTranslations(languageCode);
         return null;
+      }
+
+      // Check if keys have changed (invalidate cache if keys are different)
+      if (currentKeys && data.keysHash) {
+        const currentKeysHash = this.generateKeysHash(currentKeys);
+        if (data.keysHash !== currentKeysHash) {
+          console.log('Translation keys have changed, clearing cache for', languageCode);
+          this.clearTranslations(languageCode);
+          return null;
+        }
       }
       
       return data;
@@ -90,6 +108,7 @@ class StorageService {
       });
       // Clear current language
       localStorage.removeItem(this.getCurrentLanguageKey());
+      console.log('All cache cleared');
     } catch (error) {
       console.error('Failed to clear all cache:', error);
     }

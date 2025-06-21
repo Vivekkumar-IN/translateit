@@ -1,11 +1,13 @@
 import * as yaml from 'js-yaml';
-import { CONFIG } from '@/config/appConfig';
+import { AppService } from '@/config/appService';
 
 interface YamlData {
   [key: string]: string;
 }
 
 class YamlService {
+  private originalKeyOrder: string[] = [];
+
   async loadYamlFromGitHub(languageCode: string = 'en'): Promise<YamlData> {
     try {
       const jsonModule = await import(`@/data/langs/${languageCode}.json`);
@@ -16,6 +18,11 @@ class YamlService {
       }
 
       const processedData: YamlData = {};
+
+      if (languageCode === 'en') {
+        this.originalKeyOrder = Object.keys(jsonData);
+      }
+
       for (const [key, value] of Object.entries(jsonData)) {
         processedData[key] = String(value);
       }
@@ -26,29 +33,37 @@ class YamlService {
     }
   }
 
-  private shouldUseLiteralBlock(value: string): boolean {
-    const newlineCount = (value.match(/\n/g) || []).length;
-    return (
-      newlineCount > CONFIG.YAML_FORMATTING.MAX_NEWLINES_INLINE ||
-      value.length > CONFIG.YAML_FORMATTING.MAX_LENGTH_INLINE
-    );
+  private getKeyPrefix(key: string): string {
+    const match = key.match(/^([a-zA-Z]+)(?:_|[0-9])/);
+    return match ? match[1] : key;
   }
 
   generateYamlString(translations: { [key: string]: string }): string {
     try {
       const yamlLines: string[] = [];
+      let lastPrefix = '';
 
-      for (const [key, value] of Object.entries(translations)) {
-        if (this.shouldUseLiteralBlock(value)) {
-          yamlLines.push(`${key}: |`);
-          const lines = value.split('\n');
-          for (const line of lines) {
-            yamlLines.push(`  ${line}`);
-          }
-        } else {
-          const escapedValue = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-          yamlLines.push(`${key}: "${escapedValue}"`);
+      const orderedKeys = this.originalKeyOrder.length > 0
+        ? this.originalKeyOrder.filter((key) => key in translations)
+        : Object.keys(translations);
+
+      for (const key of orderedKeys) {
+        const value = translations[key];
+        if (value === undefined) continue;
+
+        const currentPrefix = this.getKeyPrefix(key);
+
+        if (lastPrefix && lastPrefix !== currentPrefix) {
+          yamlLines.push('');
         }
+
+        const escaped = value
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n');
+
+        yamlLines.push(`${key}: "${escaped}"`);
+        lastPrefix = currentPrefix;
       }
 
       return yamlLines.join('\n');
@@ -57,7 +72,7 @@ class YamlService {
         lineWidth: -1,
         noRefs: true,
         quotingType: '"',
-        forceQuotes: false,
+        forceQuotes: true,
       });
     }
   }

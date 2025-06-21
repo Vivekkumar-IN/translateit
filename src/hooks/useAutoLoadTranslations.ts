@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { storageService } from '@/services/storageService';
+import { yamlService } from '@/services/yamlService';
 import { TranslationData } from '@/types';
 
 interface UseAutoLoadTranslationsReturn {
@@ -25,11 +26,25 @@ export const useAutoLoadTranslations = (): UseAutoLoadTranslationsReturn => {
       
       const currentLang = storageService.getCurrentLanguage();
       if (currentLang) {
-        const savedData = storageService.loadTranslations(currentLang);
-        if (savedData && Object.keys(savedData.translations).length > 0) {
-          setFoundTranslation(savedData);
-          setLanguageCode(currentLang);
-          setIsAutoLoading(true);
+        try {
+          // Load current English keys to validate against cached data
+          const englishData = await yamlService.loadYamlFromGitHub('en');
+          const currentKeys = Object.keys(englishData);
+          
+          // Load cached data with key validation
+          const savedData = storageService.loadTranslations(currentLang, currentKeys);
+          
+          if (savedData && Object.keys(savedData.translations).length > 0) {
+            setFoundTranslation(savedData);
+            setLanguageCode(currentLang);
+            setIsAutoLoading(true);
+          }
+        } catch (error) {
+          console.log('Failed to validate cached translations, will start fresh');
+          // Clear potentially corrupted cache
+          if (currentLang) {
+            storageService.clearTranslations(currentLang);
+          }
         }
       }
       

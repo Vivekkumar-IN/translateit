@@ -155,8 +155,7 @@ export const AppService = {
   },
 
   YAML_FORMATTING: {
-    MAX_NEWLINES_INLINE: 1,    // Use block style for multiline content
-    MAX_LENGTH_INLINE: 100,    // Use block style for long strings
+    MAX_NEWLINES_INLINE: 3,    // Use block style for multiline content
   },
 
   TRANSLATION_WARNING: {

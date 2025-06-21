@@ -40,32 +40,6 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 }) => {
   const [searchInput, setSearchInput] = useState(filters.searchTerm);
 
-  // Calculate the actual filtered count based on current filters
-  const getFilteredKeys = () => {
-    return allKeys.filter(key => {
-      // Search by key name (exact match and partial match)
-      if (filters.searchTerm) {
-        const searchLower = filters.searchTerm.toLowerCase();
-        const keyLower = key.toLowerCase();
-        
-        // Check if the search term matches the key exactly or partially
-        if (!keyLower.includes(searchLower)) {
-          return false;
-        }
-      }
-
-      // Translation status filters
-      const isTranslated = !!translations[key];
-      if (filters.showOnlyUntranslated && isTranslated) return false;
-      if (filters.showOnlyTranslated && !isTranslated) return false;
-
-      return true;
-    });
-  };
-
-  const actualFilteredKeys = getFilteredKeys();
-  const actualFilteredCount = actualFilteredKeys.length;
-
   // Auto-search with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -173,7 +147,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
         {/* Results summary */}
         <div className="flex justify-between items-center text-xs text-muted-foreground pt-2 border-t">
           <span>
-            Showing {actualFilteredCount} of {totalKeys} keys
+            Showing {filteredKeys} of {totalKeys} keys
           </span>
           <span>
             {translatedKeys} translated

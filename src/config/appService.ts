@@ -29,8 +29,7 @@ export const AppService = {
 
   // YAML formatting configuration
   YAML_FORMATTING: {
-    MAX_NEWLINES_INLINE: 1,
-    MAX_LENGTH_INLINE: 100,
+    MAX_NEWLINES_INLINE: 3,
   },
 
   // Social links configuration
