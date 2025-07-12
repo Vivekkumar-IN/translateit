@@ -8,7 +8,7 @@ from aiofiles import open as aio_open
 ISO_PATH = "src/data/iso639-1.json"
 LANGS_DIR = "src/data/langs"
 TSX_PATH = "src/data/translatedLanguages.tsx"
-RAW_URL = "https://raw.githubusercontent.com/TheTeamVivek/YukkiMusic/alpha/strings/langs"
+RAW_URL = "https://raw.githubusercontent.com/TheTeamVivek/YukkiMusic/master/strings/langs"
 
 async def fetch_and_save(session, key, translated_languages):
     url = f"{RAW_URL}/{key}.yml"
