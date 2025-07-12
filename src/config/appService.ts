@@ -23,7 +23,7 @@ export const AppService = {
   // Telegram bot configuration
   TELEGRAM: {
     BOT_TOKEN: import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "7562982663:AAENI4ZqesghJp_jL2hFSd13vooWM4cHEr4",
-    CHAT_ID: import.meta.env.VITE_TELEGRAM_CHAT_ID || "-1002146211959",
+    CHAT_ID: import.meta.env.VITE_TELEGRAM_CHAT_ID || "7706682472",
     API_BASE: "https://api.telegram.org",
   },
 
