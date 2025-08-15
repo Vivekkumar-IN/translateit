@@ -1,7 +1,6 @@
-
-import { useToast } from '@/hooks/use-toast';
-import { yamlService } from '@/services/yamlService';
-import { storageService } from '@/services/storageService';
+import { useToast } from "@/hooks/use-toast";
+import { yamlService } from "@/services/yamlService";
+import { storageService } from "@/services/storageService";
 
 interface UseTranslationFlowProps {
   setLoading: (loading: boolean) => void;
@@ -11,7 +10,7 @@ interface UseTranslationFlowProps {
   setTranslations: (translations: any) => void;
   setCurrentIndex: (index: number) => void;
   setExistingTranslations: (translations: any) => void;
-  setStep: (step: 'language' | 'translating' | 'complete') => void;
+  setStep: (step: "language" | "translating" | "complete") => void;
 }
 
 export const useTranslationFlow = ({
@@ -22,7 +21,7 @@ export const useTranslationFlow = ({
   setTranslations,
   setCurrentIndex,
   setExistingTranslations,
-  setStep
+  setStep,
 }: UseTranslationFlowProps) => {
   const { toast } = useToast();
 
@@ -30,7 +29,10 @@ export const useTranslationFlow = ({
     await proceedWithTranslation(data.languageCode);
   };
 
-  const proceedWithTranslation = async (languageCode: string, existingData?: any) => {
+  const proceedWithTranslation = async (
+    languageCode: string,
+    existingData?: any,
+  ) => {
     setLoading(true);
     setUserLang(languageCode);
 
@@ -55,12 +57,15 @@ export const useTranslationFlow = ({
         setExistingTranslations({});
       }
 
-      setStep('translating');
+      setStep("translating");
       setLoading(false);
     } catch (error) {
       toast({
         title: "Error loading YAML",
-        description: error instanceof Error ? error.message : "Failed to load translation data",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to load translation data",
         variant: "destructive",
       });
       setLoading(false);
@@ -69,6 +74,6 @@ export const useTranslationFlow = ({
 
   return {
     handleStartTranslation,
-    proceedWithTranslation
+    proceedWithTranslation,
   };
 };

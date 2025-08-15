@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,9 +6,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { TranslationData } from '@/types';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { TranslationData } from "@/types";
 
 interface ContinueTranslationDialogProps {
   open: boolean;
@@ -28,7 +27,7 @@ const ContinueTranslationDialog: React.FC<ContinueTranslationDialogProps> = ({
   savedTranslationData,
   onContinue,
   onRestart,
-  onCancel
+  onCancel,
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,10 +35,19 @@ const ContinueTranslationDialog: React.FC<ContinueTranslationDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Previous Translation Found</DialogTitle>
           <DialogDescription>
-            Found previous translation progress for <strong>{pendingLanguageCode.toUpperCase()}</strong> with{' '}
-            <strong>{savedTranslationData?.translations ? Object.keys(savedTranslationData.translations).length : 0} translations</strong>.
-            <br /><br />
-            Do you want to continue where you left off or start a fresh translation?
+            Found previous translation progress for{" "}
+            <strong>{pendingLanguageCode.toUpperCase()}</strong> with{" "}
+            <strong>
+              {savedTranslationData?.translations
+                ? Object.keys(savedTranslationData.translations).length
+                : 0}{" "}
+              translations
+            </strong>
+            .
+            <br />
+            <br />
+            Do you want to continue where you left off or start a fresh
+            translation?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col gap-2">

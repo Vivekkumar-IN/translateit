@@ -1,15 +1,9 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Search, 
-  X,
-  CheckCircle,
-  Clock
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Search, X, CheckCircle, Clock } from "lucide-react";
 
 interface SearchFilters {
   searchTerm: string;
@@ -36,14 +30,14 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   translatedKeys,
   allKeys,
   yamlData,
-  translations
+  translations,
 }) => {
   const [searchInput, setSearchInput] = useState(filters.searchTerm);
 
   // Auto-search with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      updateFilter('searchTerm', searchInput);
+      updateFilter("searchTerm", searchInput);
     }, 300);
 
     return () => clearTimeout(timer);
@@ -51,14 +45,14 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
   const updateFilter = (key: keyof SearchFilters, value: any) => {
     let newFilters = { ...filters, [key]: value };
-    
+
     // Handle conflicting translation status filters
-    if (key === 'showOnlyUntranslated' && value === true) {
+    if (key === "showOnlyUntranslated" && value === true) {
       newFilters.showOnlyTranslated = false;
-    } else if (key === 'showOnlyTranslated' && value === true) {
+    } else if (key === "showOnlyTranslated" && value === true) {
       newFilters.showOnlyUntranslated = false;
     }
-    
+
     onFiltersChange(newFilters);
   };
 
@@ -70,11 +64,14 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   const clearSearch = (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
-    setSearchInput('');
-    updateFilter('searchTerm', '');
+    setSearchInput("");
+    updateFilter("searchTerm", "");
   };
 
-  const handleFilterClick = (filterType: 'showOnlyUntranslated' | 'showOnlyTranslated', e: React.MouseEvent) => {
+  const handleFilterClick = (
+    filterType: "showOnlyUntranslated" | "showOnlyTranslated",
+    e: React.MouseEvent,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     updateFilter(filterType, !filters[filterType]);
@@ -83,8 +80,8 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
   const activeFiltersCount = [
     filters.searchTerm,
     filters.showOnlyUntranslated,
-    filters.showOnlyTranslated
-  ].filter(value => value !== '' && value !== false).length;
+    filters.showOnlyTranslated,
+  ].filter((value) => value !== "" && value !== false).length;
 
   return (
     <Card>
@@ -99,7 +96,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
           )}
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Basic search */}
         <div className="relative">
@@ -127,7 +124,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
           <Button
             variant={filters.showOnlyUntranslated ? "default" : "outline"}
             size="sm"
-            onClick={(e) => handleFilterClick('showOnlyUntranslated', e)}
+            onClick={(e) => handleFilterClick("showOnlyUntranslated", e)}
             className="text-xs"
           >
             <Clock className="w-3 h-3 mr-1" />
@@ -136,7 +133,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
           <Button
             variant={filters.showOnlyTranslated ? "default" : "outline"}
             size="sm"
-            onClick={(e) => handleFilterClick('showOnlyTranslated', e)}
+            onClick={(e) => handleFilterClick("showOnlyTranslated", e)}
             className="text-xs"
           >
             <CheckCircle className="w-3 h-3 mr-1" />
@@ -149,9 +146,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
           <span>
             Showing {filteredKeys} of {totalKeys} keys
           </span>
-          <span>
-            {translatedKeys} translated
-          </span>
+          <span>{translatedKeys} translated</span>
         </div>
       </CardContent>
     </Card>

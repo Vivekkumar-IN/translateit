@@ -1,10 +1,9 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Download, Send, RotateCcw, Loader2 } from 'lucide-react';
-import ProgressStats from './ProgressStats';
-import { storageService } from '@/services/storageService';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Download, Send, RotateCcw, Loader2 } from "lucide-react";
+import ProgressStats from "./ProgressStats";
+import { storageService } from "@/services/storageService";
 
 interface TranslationCompleteProps {
   translatedCount: number;
@@ -27,7 +26,7 @@ const TranslationComplete: React.FC<TranslationCompleteProps> = ({
   onDownloadYaml,
   onSendToTelegram,
   onReset,
-  onStartNew
+  onStartNew,
 }) => {
   const handleStartNewTranslation = () => {
     storageService.clearAllCache();
@@ -47,15 +46,15 @@ const TranslationComplete: React.FC<TranslationCompleteProps> = ({
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <ProgressStats 
+            <ProgressStats
               translated={translatedCount}
               total={totalCount}
               language={userLang}
               isComplete={true}
             />
             <div className="flex flex-col gap-3">
-              <Button 
-                onClick={onDownloadYaml} 
+              <Button
+                onClick={onDownloadYaml}
                 className="w-full"
                 disabled={downloadLoading}
               >
@@ -71,14 +70,18 @@ const TranslationComplete: React.FC<TranslationCompleteProps> = ({
                   </>
                 )}
               </Button>
-              <Button onClick={onSendToTelegram} disabled={loading} className="w-full">
+              <Button
+                onClick={onSendToTelegram}
+                disabled={loading}
+                className="w-full"
+              >
                 <Send className="w-4 h-4 mr-2" />
-                {loading ? 'Sending...' : 'Send to Telegram'}
+                {loading ? "Sending..." : "Send to Telegram"}
               </Button>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={handleStartNewTranslation} 
+            <Button
+              variant="outline"
+              onClick={handleStartNewTranslation}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white border-blue-500 hover:border-blue-600"
               disabled={loading || downloadLoading}
             >

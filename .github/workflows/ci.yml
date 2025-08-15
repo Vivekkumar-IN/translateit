@@ -1,4 +1,4 @@
-name: Update and deploy
+name: CI
 
 on:
   push:
@@ -64,25 +64,22 @@ jobs:
       - name: ⚙️ Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22'
           cache: 'npm'
 
       - name: 📦 Install dependencies
         run: npm ci
 
       - name: 🔨 Build site
-        run: npm run build
+        run: |
+          npm run build
+          cd dist && cp index.html 404.html
         env:
           NODE_ENV: production
           VITE_TELEGRAM_BOT_TOKEN: ${{ secrets.VITE_TELEGRAM_BOT_TOKEN }}
           VITE_TELEGRAM_CHAT_ID: ${{ secrets.VITE_TELEGRAM_CHAT_ID }}
           VITE_BASE_PATH: "/translateit/"
-
-      - name: 📄 Create 404 page for SPA routing
-        run: |
-          cp dist/index.html dist/404.html
-          echo "404.html created for GitHub Pages SPA routing"
-
+          
       - name: 📤 Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -104,3 +101,31 @@ jobs:
         with:
           keep_minimum_runs: 0
           retain_days: 0
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Format Code
+        run: |
+          npx prettier --write "**/*.{js,ts,tsx,html,css,json}"
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto format code"
+          commit_options: "--no-verify"
+          repository: .
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"

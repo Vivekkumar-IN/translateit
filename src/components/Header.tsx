@@ -1,8 +1,7 @@
-
-import React from 'react';
-import { AppService } from '@/config/appService';
-import { Languages } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+import React from "react";
+import { AppService } from "@/config/appService";
+import { Languages } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const Header: React.FC = () => {
   return (

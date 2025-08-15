@@ -1,12 +1,19 @@
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle, AlertTriangle, Globe, Languages, Star, Sparkles } from 'lucide-react';
-import { languageService } from '../services/languageService';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+  Globe,
+  Languages,
+  Star,
+  Sparkles,
+} from "lucide-react";
+import { languageService } from "../services/languageService";
 
 interface LanguageInputProps {
   onStart: (data: { languageCode: string }) => void;
@@ -14,7 +21,7 @@ interface LanguageInputProps {
 }
 
 const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
-  const [languageCode, setLanguageCode] = useState('');
+  const [languageCode, setLanguageCode] = useState("");
   const [validation, setValidation] = useState<{
     isValid: boolean;
     name?: string;
@@ -22,7 +29,8 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
 
   // Get language categories synchronously (fast loading)
   const translatedLanguages = languageService.getTranslatedLanguageDetails();
-  const popularUntranslatedLanguages = languageService.getPopularUntranslatedLanguages();
+  const popularUntranslatedLanguages =
+    languageService.getPopularUntranslatedLanguages();
   const allLanguagesWithStatus = languageService.getAllLanguagesWithStatus();
 
   useEffect(() => {
@@ -37,8 +45,8 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (languageCode.trim() && validation?.isValid) {
-      onStart({ 
-        languageCode: languageCode.trim().toLowerCase()
+      onStart({
+        languageCode: languageCode.trim().toLowerCase(),
       });
     }
   };
@@ -48,13 +56,18 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
   };
 
   const truncateName = (name: string, maxLength: number = 12) => {
-    return name.length > maxLength ? name.substring(0, maxLength) + '...' : name;
+    return name.length > maxLength
+      ? name.substring(0, maxLength) + "..."
+      : name;
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="langCode" className="text-sm font-medium flex items-center gap-2">
+        <Label
+          htmlFor="langCode"
+          className="text-sm font-medium flex items-center gap-2"
+        >
           <Languages className="w-4 h-4" />
           Enter your language code (ISO 639-1)
         </Label>
@@ -67,7 +80,7 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
           className="text-center"
           disabled={loading}
         />
-        
+
         {/* Validation feedback */}
         {validation && (
           <div className="space-y-2">
@@ -88,7 +101,7 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
             )}
           </div>
         )}
-        
+
         <p className="text-xs text-muted-foreground text-center">
           Use 2-letter ISO codes like 'hi' for Hindi, 'fr' for French, etc.
         </p>
@@ -108,8 +121,8 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
               key={lang.code}
               variant={languageCode === lang.code ? "default" : "secondary"}
               className={`cursor-pointer justify-center py-2 text-xs transition-all duration-200 ${
-                languageCode === lang.code 
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 scale-105" 
+                languageCode === lang.code
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 scale-105"
                   : "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-200 border-green-200 dark:border-green-800 hover:scale-105"
               }`}
               onClick={() => handleLanguageSelect(lang.code)}
@@ -126,7 +139,8 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
           <div className="flex items-center gap-2 pb-2 border-b border-amber-200 dark:border-amber-800">
             <Star className="w-4 h-4 text-amber-600" />
             <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">
-              Popular Languages Available ({popularUntranslatedLanguages.length})
+              Popular Languages Available ({popularUntranslatedLanguages.length}
+              )
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -135,8 +149,8 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
                 key={lang.code}
                 variant={languageCode === lang.code ? "default" : "outline"}
                 className={`cursor-pointer justify-center py-2 text-xs transition-all duration-200 ${
-                  languageCode === lang.code 
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 scale-105" 
+                  languageCode === lang.code
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 scale-105"
                     : "hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-50 dark:hover:from-amber-900/20 dark:hover:to-yellow-900/20 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 hover:scale-105"
                 }`}
                 onClick={() => handleLanguageSelect(lang.code)}
@@ -162,8 +176,8 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
               <div
                 key={lang.code}
                 className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 group ${
-                  languageCode === lang.code 
-                    ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md scale-[1.02]" 
+                  languageCode === lang.code
+                    ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md scale-[1.02]"
                     : "hover:bg-gradient-to-r hover:from-accent/50 hover:to-accent/30 hover:shadow-sm hover:scale-[1.01]"
                 }`}
                 onClick={() => handleLanguageSelect(lang.code)}
@@ -188,9 +202,9 @@ const LanguageInput: React.FC<LanguageInputProps> = ({ onStart, loading }) => {
         </div>
       </div>
 
-      <Button 
-        type="submit" 
-        disabled={!languageCode.trim() || loading || !validation?.isValid} 
+      <Button
+        type="submit"
+        disabled={!languageCode.trim() || loading || !validation?.isValid}
         className="w-full py-3 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-200"
       >
         {loading ? (

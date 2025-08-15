@@ -1,10 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, Save, CheckCircle, Copy, Check, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  ChevronLeft,
+  Save,
+  CheckCircle,
+  Copy,
+  Check,
+  ArrowRight,
+} from "lucide-react";
 
 interface TranslationCardProps {
   keyName: string;
@@ -27,7 +33,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   onSave,
   onPrevious,
   canGoPrevious,
-  isTranslated
+  isTranslated,
 }) => {
   const [translation, setTranslation] = useState(currentTranslation);
   const [copied, setCopied] = useState(false);
@@ -51,7 +57,7 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
     try {
       await navigator.clipboard.writeText(originalText);
       setCopied(true);
-      
+
       // Reset the check mark after 2 seconds
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -60,7 +66,9 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
   };
 
   const getTranslationLabel = () => {
-    return existingTranslation && !currentTranslation ? "Existing Translation:" : "Your translation:";
+    return existingTranslation && !currentTranslation
+      ? "Existing Translation:"
+      : "Your translation:";
   };
 
   const getTranslationPlaceholder = () => {
@@ -72,21 +80,21 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
 
   const getSaveButtonText = () => {
     if (translation.trim()) {
-      return 'Save & Continue';
+      return "Save & Continue";
     }
     // Show what will be used as default when no custom translation is provided
     if (existingTranslation) {
-      return 'Use Existing & Continue';
+      return "Use Existing & Continue";
     }
-    return 'Use Original & Continue';
+    return "Use Original & Continue";
   };
 
   // Format text for display, preserving newlines
   const formatTextForDisplay = (text: string) => {
-    return text.split('\n').map((line, index) => (
+    return text.split("\n").map((line, index) => (
       <span key={index}>
         {line}
-        {index < text.split('\n').length - 1 && <br />}
+        {index < text.split("\n").length - 1 && <br />}
       </span>
     ));
   };
@@ -96,10 +104,17 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-            <code className="bg-muted px-2 py-1 rounded text-xs sm:text-sm break-all">{keyName}</code>
-            {isTranslated && <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />}
+            <code className="bg-muted px-2 py-1 rounded text-xs sm:text-sm break-all">
+              {keyName}
+            </code>
+            {isTranslated && (
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+            )}
           </CardTitle>
-          <Badge variant={isTranslated ? "default" : "secondary"} className="text-xs">
+          <Badge
+            variant={isTranslated ? "default" : "secondary"}
+            className="text-xs"
+          >
             {isTranslated ? "Translated" : "Pending"}
           </Badge>
         </div>
@@ -107,7 +122,9 @@ const TranslationCard: React.FC<TranslationCardProps> = ({
       <CardContent className="space-y-4">
         {/* Original text with copy button inside the box */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground">Original (English):</h4>
+          <h4 className="text-sm font-medium text-muted-foreground">
+            Original (English):
+          </h4>
           <div className="bg-muted p-3 rounded-md relative">
             <p className="text-sm italic break-words pr-8 whitespace-pre-wrap">
               {formatTextForDisplay(originalText)}

@@ -1,7 +1,6 @@
-
-import React from 'react';
-import { Github, MessageCircle } from 'lucide-react';
-import { AppService } from '@/config/appService';
+import React from "react";
+import { Github, MessageCircle } from "lucide-react";
+import { AppService } from "@/config/appService";
 
 const SocialFooter: React.FC = () => {
   return (

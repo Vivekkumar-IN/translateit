@@ -1,7 +1,6 @@
-
-import { useEffect, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "react-router-dom";
 
 export const useBackButtonHandler = () => {
   const { toast } = useToast();
@@ -12,16 +11,16 @@ export const useBackButtonHandler = () => {
   // Only handle back button on main page
   useEffect(() => {
     // Only enable on root path
-    if (location.pathname !== '/') {
+    if (location.pathname !== "/") {
       return;
     }
 
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
-      
+
       const now = Date.now();
       const timeSinceLastPress = now - lastBackPressRef.current;
-      
+
       if (timeSinceLastPress < DOUBLE_PRESS_DELAY) {
         // Double tap detected - quit the app
         window.close();
@@ -30,21 +29,22 @@ export const useBackButtonHandler = () => {
         lastBackPressRef.current = now;
         toast({
           title: "Tap again to quit",
-          description: "Press back button again within 2 seconds to exit the application",
+          description:
+            "Press back button again within 2 seconds to exit the application",
           duration: 2000,
         });
       }
-      
+
       // Push state back to prevent navigation
-      window.history.pushState(null, '', window.location.href);
+      window.history.pushState(null, "", window.location.href);
     };
 
     // Push initial state to prevent immediate back navigation
-    window.history.pushState(null, '', window.location.href);
-    window.addEventListener('popstate', handlePopState);
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [location.pathname, toast]);
 

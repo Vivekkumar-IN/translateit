@@ -12,27 +12,34 @@ class StorageService {
   }
 
   private getCurrentLanguageKey(): string {
-    return 'current_language_key';
+    return "current_language_key";
   }
 
   // Generate a hash that preserves the original order of keys
   private generateKeysHash(keys: string[]): string {
     // Don't sort the keys - keep their original order for the hash
-    return keys.join('|');
+    return keys.join("|");
   }
 
-  saveTranslations(languageCode: string, data: Omit<StoredTranslationData, 'timestamp' | 'keysHash'>, currentKeys?: string[]): void {
+  saveTranslations(
+    languageCode: string,
+    data: Omit<StoredTranslationData, "timestamp" | "keysHash">,
+    currentKeys?: string[],
+  ): void {
     try {
       const storageData: StoredTranslationData = {
         ...data,
         timestamp: Date.now(),
-        keysHash: currentKeys ? this.generateKeysHash(currentKeys) : undefined
+        keysHash: currentKeys ? this.generateKeysHash(currentKeys) : undefined,
       };
-      localStorage.setItem(this.getStorageKey(languageCode), JSON.stringify(storageData));
+      localStorage.setItem(
+        this.getStorageKey(languageCode),
+        JSON.stringify(storageData),
+      );
       // Also save the current language key
       this.saveCurrentLanguage(languageCode);
     } catch (error) {
-      console.error('Failed to save translations:', error);
+      console.error("Failed to save translations:", error);
     }
   }
 
@@ -40,7 +47,7 @@ class StorageService {
     try {
       localStorage.setItem(this.getCurrentLanguageKey(), languageCode);
     } catch (error) {
-      console.error('Failed to save current language:', error);
+      console.error("Failed to save current language:", error);
     }
   }
 
@@ -48,22 +55,25 @@ class StorageService {
     try {
       return localStorage.getItem(this.getCurrentLanguageKey());
     } catch (error) {
-      console.error('Failed to get current language:', error);
+      console.error("Failed to get current language:", error);
       return null;
     }
   }
 
-  loadTranslations(languageCode: string, currentKeys?: string[]): StoredTranslationData | null {
+  loadTranslations(
+    languageCode: string,
+    currentKeys?: string[],
+  ): StoredTranslationData | null {
     try {
       const stored = localStorage.getItem(this.getStorageKey(languageCode));
       if (!stored) return null;
-      
+
       const data: StoredTranslationData = JSON.parse(stored);
-      
+
       // Check if data is older than 7 days
-      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
       if (data.timestamp < sevenDaysAgo) {
-        console.log('Cache expired, clearing translations for', languageCode);
+        console.log("Cache expired, clearing translations for", languageCode);
         this.clearTranslations(languageCode);
         return null;
       }
@@ -72,15 +82,18 @@ class StorageService {
       if (currentKeys && data.keysHash) {
         const currentKeysHash = this.generateKeysHash(currentKeys);
         if (data.keysHash !== currentKeysHash) {
-          console.log('Translation keys have changed, clearing cache for', languageCode);
+          console.log(
+            "Translation keys have changed, clearing cache for",
+            languageCode,
+          );
           this.clearTranslations(languageCode);
           return null;
         }
       }
-      
+
       return data;
     } catch (error) {
-      console.error('Failed to load translations:', error);
+      console.error("Failed to load translations:", error);
       return null;
     }
   }
@@ -93,7 +106,7 @@ class StorageService {
         localStorage.removeItem(this.getCurrentLanguageKey());
       }
     } catch (error) {
-      console.error('Failed to clear translations:', error);
+      console.error("Failed to clear translations:", error);
     }
   }
 
@@ -101,16 +114,16 @@ class StorageService {
     try {
       // Clear all translation data
       const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith('yaml_translations_')) {
+      keys.forEach((key) => {
+        if (key.startsWith("yaml_translations_")) {
           localStorage.removeItem(key);
         }
       });
       // Clear current language
       localStorage.removeItem(this.getCurrentLanguageKey());
-      console.log('All cache cleared');
+      console.log("All cache cleared");
     } catch (error) {
-      console.error('Failed to clear all cache:', error);
+      console.error("Failed to clear all cache:", error);
     }
   }
 
@@ -118,10 +131,10 @@ class StorageService {
     try {
       const keys = Object.keys(localStorage);
       return keys
-        .filter(key => key.startsWith('yaml_translations_'))
-        .map(key => key.replace('yaml_translations_', ''));
+        .filter((key) => key.startsWith("yaml_translations_"))
+        .map((key) => key.replace("yaml_translations_", ""));
     } catch (error) {
-      console.error('Failed to get stored languages:', error);
+      console.error("Failed to get stored languages:", error);
       return [];
     }
   }

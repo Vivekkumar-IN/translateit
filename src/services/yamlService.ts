@@ -1,5 +1,5 @@
-import * as yaml from 'js-yaml';
-import { AppService } from '@/config/appService';
+import * as yaml from "js-yaml";
+import { AppService } from "@/config/appService";
 
 interface YamlData {
   [key: string]: string;
@@ -8,18 +8,18 @@ interface YamlData {
 class YamlService {
   private originalKeyOrder: string[] = [];
 
-  async loadYamlFromGitHub(languageCode: string = 'en'): Promise<YamlData> {
+  async loadYamlFromGitHub(languageCode: string = "en"): Promise<YamlData> {
     try {
       const jsonModule = await import(`@/data/langs/${languageCode}.json`);
       const jsonData = jsonModule.default || jsonModule;
 
       if (!jsonData || Object.keys(jsonData).length === 0) {
-        throw new Error('No valid JSON key-value pairs found');
+        throw new Error("No valid JSON key-value pairs found");
       }
 
       const processedData: YamlData = {};
 
-      if (languageCode === 'en') {
+      if (languageCode === "en") {
         this.originalKeyOrder = Object.keys(jsonData);
       }
 
@@ -41,11 +41,12 @@ class YamlService {
   generateYamlString(translations: { [key: string]: string }): string {
     try {
       const yamlLines: string[] = [];
-      let lastPrefix = '';
+      let lastPrefix = "";
 
-      const orderedKeys = this.originalKeyOrder.length > 0
-        ? this.originalKeyOrder.filter((key) => key in translations)
-        : Object.keys(translations);
+      const orderedKeys =
+        this.originalKeyOrder.length > 0
+          ? this.originalKeyOrder.filter((key) => key in translations)
+          : Object.keys(translations);
 
       for (const key of orderedKeys) {
         const value = translations[key];
@@ -54,19 +55,19 @@ class YamlService {
         const currentPrefix = this.getKeyPrefix(key);
 
         if (lastPrefix && lastPrefix !== currentPrefix) {
-          yamlLines.push('');
+          yamlLines.push("");
         }
 
         const escaped = value
-          .replace(/\\/g, '\\\\')
+          .replace(/\\/g, "\\\\")
           .replace(/"/g, '\\"')
-          .replace(/\n/g, '\\n');
+          .replace(/\n/g, "\\n");
 
         yamlLines.push(`${key}: "${escaped}"`);
         lastPrefix = currentPrefix;
       }
 
-      return yamlLines.join('\n');
+      return yamlLines.join("\n");
     } catch {
       return yaml.dump(translations, {
         lineWidth: -1,
@@ -77,12 +78,15 @@ class YamlService {
     }
   }
 
-  downloadTranslations(translations: { [key: string]: string }, languageCode: string): void {
+  downloadTranslations(
+    translations: { [key: string]: string },
+    languageCode: string,
+  ): void {
     const yamlContent = this.generateYamlString(translations);
-    const blob = new Blob([yamlContent], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([yamlContent], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = `${languageCode}.yml`;
     document.body.appendChild(link);

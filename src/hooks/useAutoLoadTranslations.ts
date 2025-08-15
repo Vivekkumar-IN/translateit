@@ -1,8 +1,7 @@
-
-import { useEffect, useState } from 'react';
-import { storageService } from '@/services/storageService';
-import { yamlService } from '@/services/yamlService';
-import { TranslationData } from '@/types';
+import { useEffect, useState } from "react";
+import { storageService } from "@/services/storageService";
+import { yamlService } from "@/services/yamlService";
+import { TranslationData } from "@/types";
 
 interface UseAutoLoadTranslationsReturn {
   isAutoLoading: boolean;
@@ -16,38 +15,44 @@ interface UseAutoLoadTranslationsReturn {
 export const useAutoLoadTranslations = (): UseAutoLoadTranslationsReturn => {
   const [isAutoLoading, setIsAutoLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [foundTranslation, setFoundTranslation] = useState<TranslationData | null>(null);
+  const [foundTranslation, setFoundTranslation] =
+    useState<TranslationData | null>(null);
   const [languageCode, setLanguageCode] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for existing translations on app load
     const checkExistingTranslations = async () => {
       setIsInitializing(true);
-      
+
       const currentLang = storageService.getCurrentLanguage();
       if (currentLang) {
         try {
           // Load current English keys to validate against cached data
-          const englishData = await yamlService.loadYamlFromGitHub('en');
+          const englishData = await yamlService.loadYamlFromGitHub("en");
           const currentKeys = Object.keys(englishData);
-          
+
           // Load cached data with key validation
-          const savedData = storageService.loadTranslations(currentLang, currentKeys);
-          
+          const savedData = storageService.loadTranslations(
+            currentLang,
+            currentKeys,
+          );
+
           if (savedData && Object.keys(savedData.translations).length > 0) {
             setFoundTranslation(savedData);
             setLanguageCode(currentLang);
             setIsAutoLoading(true);
           }
         } catch (error) {
-          console.log('Failed to validate cached translations, will start fresh');
+          console.log(
+            "Failed to validate cached translations, will start fresh",
+          );
           // Clear potentially corrupted cache
           if (currentLang) {
             storageService.clearTranslations(currentLang);
           }
         }
       }
-      
+
       // Shorter delay to prevent flash
       setTimeout(() => {
         setIsInitializing(false);
@@ -62,7 +67,7 @@ export const useAutoLoadTranslations = (): UseAutoLoadTranslationsReturn => {
 
     try {
       // Quick loading without notifications
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsAutoLoading(false);
     } catch (error) {
       setIsAutoLoading(false);
@@ -87,6 +92,6 @@ export const useAutoLoadTranslations = (): UseAutoLoadTranslationsReturn => {
     languageCode,
     handleAutoLoad,
     skipAutoLoad,
-    isInitializing
+    isInitializing,
   };
 };

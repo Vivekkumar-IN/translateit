@@ -1,4 +1,3 @@
-
 export interface YamlData {
   [key: string]: string;
 }
