@@ -1,14 +1,7 @@
 // Auto-generated file - DO NOT EDIT MANUALLY
 // This file is generated during the build process
 
-export const TRANSLATED_LANGUAGES: string[] = [
-  "ar",
-  "as",
-  "en",
-  "hi",
-  "ku",
-  "tr"
-];
+export const TRANSLATED_LANGUAGES: string[] = [];
 
 export const getTranslatedLanguages = (): string[] => {
   return TRANSLATED_LANGUAGES;
